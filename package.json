@@ -1,0 +1,19 @@
+{
+  "name": "circuit",
+  "private": true,
+  "license": "GPL-3.0",
+  "type": "module",
+  "scripts": {
+    "fmt": "prettier --write scripts",
+    "fmt-check": "prettier --check scripts"
+  },
+  "dependencies": {
+    "@scure/starknet": "2.4.0",
+    "noir-jwt": "0.4.5",
+    "poseidon-lite": "0.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.4",
+    "prettier": "3.9.9"
+  }
+}
