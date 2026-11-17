@@ -76,16 +76,15 @@ const identityHash = poseidon9([
   SALT,
 ]);
 
-const letter = (iss: string) =>
-  generateInputs({
-    jwt: sign(iss),
-    pubkey: publicKey.export({ format: "jwk" }),
-    maxSignedDataLength: MAX_DATA_LENGTH,
-  });
+const jwk = publicKey.export({ format: "jwk" });
 
-const google = await letter(GOOGLE_ISS);
+const letter = (jwt: string) =>
+  generateInputs({ jwt, pubkey: jwk, maxSignedDataLength: MAX_DATA_LENGTH });
+
+const jwt = sign(GOOGLE_ISS);
+const google = await letter(jwt);
 // signed correctly, but iss is not Google
-const otherIss = await letter("http://test.com");
+const otherIss = await letter(sign("http://test.com"));
 
 const write = (path: string, text: string) =>
   fs.writeFileSync(new URL(path, import.meta.url), text);
@@ -152,3 +151,19 @@ pub global IDENTITY_HASH: Field = ${identityHash};
 ${nrLetter("GOOGLE", google)}
 ${nrLetter("OTHER_ISS", otherIss)}`;
 write("../src/tests/fixtures.nr", fixtures);
+
+// The valid letter as text, with the key that signed it and the values its proof makes public
+const fixture = {
+  jwt,
+  jwk,
+  aud: CLIENT_ID,
+  sub: SUB,
+  session_privkey: SESSION_PRIVKEY,
+  session_pubkey: inputs.session_pubkey,
+  expiry: inputs.expiry,
+  secret: inputs.secret,
+  salt: inputs.salt,
+  pubkey_modulus_limbs: inputs.pubkey_modulus_limbs,
+  identity_hash: String(identityHash),
+};
+write("../fixtures/fixture.json", `${JSON.stringify(fixture, null, 2)}\n`);
