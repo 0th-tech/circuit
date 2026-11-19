@@ -4,16 +4,18 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "fmt": "prettier --write scripts",
-    "fmt-check": "prettier --check scripts"
+    "test": "node --test \"test/**/*.test.ts\"",
+    "fmt": "prettier --write scripts test",
+    "fmt-check": "prettier --check scripts test"
   },
   "dependencies": {
     "@scure/starknet": "2.4.0",
-    "noir-jwt": "0.4.5",
+    "circomlib": "2.0.5",
     "poseidon-lite": "0.3.0"
   },
   "devDependencies": {
     "@types/node": "^26.6.4",
-    "prettier": "3.9.9"
+    "prettier": "3.9.9",
+    "snarkjs": "0.7.6"
   }
 }

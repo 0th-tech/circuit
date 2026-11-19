@@ -1,28 +1,22 @@
-FROM debian:trixie-slim
+FROM node:26.10.0-slim
 
-ARG BB_VERSION=3.0.0-nightly.20251104
-ARG NOIR_VERSION=1.0.0-beta.16
-
+# The C++ witness generator builds with g++, gmp, nlohmann-json and nasm
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl ca-certificates git \
+    curl ca-certificates unzip build-essential libgmp-dev nlohmann-json3-dev nasm \
     && rm -rf /var/lib/apt/lists/*
 
-ENV HOME=/root
-ENV PATH=/root/.local/bin:${PATH}
+ARG CIRCOM_VERSION=v2.2.3
+RUN curl -fsSL -o /usr/local/bin/circom \
+    https://github.com/iden3/circom/releases/download/${CIRCOM_VERSION}/circom-linux-amd64 \
+    && chmod +x /usr/local/bin/circom \
+    && circom --version
 
-RUN curl -Ls https://raw.githubusercontent.com/AztecProtocol/aztec-packages/master/barretenberg/bbup/install | bash \
-    && mkdir -p /root/.local/bin \
-    && /root/.bb/bbup -v ${BB_VERSION} \
-    && cp /root/.bb/bb /root/.local/bin/bb \
-    && rm -rf /root/.bb \
-    && bb --version
-
-RUN curl -Ls https://raw.githubusercontent.com/noir-lang/noirup/main/install | bash \
-    && /root/.nargo/bin/noirup -v ${NOIR_VERSION} \
-    && cp /root/.nargo/bin/nargo /root/.local/bin/nargo \
-    && rm -rf /root/.nargo \
-    && nargo --version
-
-RUN chmod -R a+rX /root
+# rapidsnark's release binary needs the libstdc++ of Debian trixie or later
+ARG RAPIDSNARK_VERSION=v0.0.8
+RUN curl -fsSL -o /tmp/rapidsnark.zip \
+    https://github.com/iden3/rapidsnark/releases/download/${RAPIDSNARK_VERSION}/rapidsnark-linux-x86_64-${RAPIDSNARK_VERSION}.zip \
+    && unzip -p /tmp/rapidsnark.zip rapidsnark-linux-x86_64-${RAPIDSNARK_VERSION}/bin/prover > /usr/local/bin/rapidsnark \
+    && chmod +x /usr/local/bin/rapidsnark \
+    && rm /tmp/rapidsnark.zip
 
 WORKDIR /work
