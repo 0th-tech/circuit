@@ -1,7 +1,7 @@
 {
   "name": "circuit",
   "private": true,
-  "license": "GPL-3.0",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "fmt": "prettier --write scripts",
